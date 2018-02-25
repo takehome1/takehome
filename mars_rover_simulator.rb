@@ -4,11 +4,16 @@ require_relative "rover.rb"
 class MarsRoverSimulator
   ROVER_COUNT = 2
 
-  def initialize
+  def initialize(testing=false)
     @plateau = Plateau.new(5, 5)
     @rovers = []
 
-    setup_test_rovers
+    if testing
+      setup_test_rovers
+    else
+      get_user_input
+    end
+
     place_all_rovers
     move_all_rovers
   end
@@ -16,6 +21,34 @@ class MarsRoverSimulator
   private
 
   attr_reader :plateau, :rovers
+
+  def get_user_input
+    puts "Welcome to Sam's Mars Rover Simulator!"
+
+    puts "Please enter the dimensions of the plateau (e.g. Enter \"5 3\" for a 5x3 plateau):"
+    current_user_input = STDIN.gets.chomp
+    @plateau = Plateau.new(*current_user_input.split.map(&:to_i))
+
+    ROVER_COUNT.times do |rover_number|
+      rover_no = rover_number + 1
+      puts "Please enter the position of Rover \##{rover_no} (e.g. Enter \"1 2 N\" to place the rover at position [1, 2], facing north):"
+      current_user_input = STDIN.gets.chomp
+      rover_position = current_user_input.split(" ").take(2).map(&:to_i)
+      rover_direction = current_user_input.split(" ").last
+
+      puts "Please enter movement instructions for Rover \##{rover_no} (e.g. Enter \"LMRM\" for the rover to turn left, move forward, turn right, and move forward):"
+      current_user_input = STDIN.gets.chomp
+      rover_instructions = current_user_input.split("")
+
+      new_rover = Rover.new(
+        position: rover_position,
+        direction: rover_direction,
+        instructions: rover_instructions,
+      )
+
+      @rovers << new_rover
+    end
+  end
 
   def setup_test_rovers
     @plateau = Plateau.new(5, 5)
