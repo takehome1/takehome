@@ -4,16 +4,12 @@ require_relative "rover.rb"
 class MarsRoverSimulator
   ROVER_COUNT = 2
 
-  def initialize(testing=false)
-    @plateau = Plateau.new(5, 5)
+  def initialize
     @rovers = []
+  end
 
-    if testing
-      setup_test_rovers
-    else
-      get_user_input
-    end
-
+  def run_simulation(scenario=nil)
+    setup_rovers(scenario)
     place_all_rovers
     move_all_rovers
   end
@@ -21,6 +17,14 @@ class MarsRoverSimulator
   private
 
   attr_reader :plateau, :rovers
+
+  def setup_rovers(scenario)
+    if scenario
+      setup_test_rovers(scenario)
+    else
+      get_user_input
+    end
+  end
 
   def get_user_input
     puts "Welcome to Sam's Mars Rover Simulator!"
@@ -50,7 +54,16 @@ class MarsRoverSimulator
     end
   end
 
-  def setup_test_rovers
+  def setup_test_rovers(scenario)
+    case scenario
+    when :success
+      instructions_2 = %w(M M R M M R M R R M)
+    when :falls_off
+      instructions_2 = %w(M M M)
+    when :collision
+      instructions_2 = %w(L L M M)
+    end
+
     @plateau = Plateau.new(5, 5)
 
     rover_1 = Rover.new(
@@ -63,7 +76,7 @@ class MarsRoverSimulator
     rover_2 = Rover.new(
       position: [3, 3],
       direction: "E",
-      instructions: %w(M M R M M R M R R M),
+      instructions: instructions_2,
     )
     @rovers << rover_2
   end
